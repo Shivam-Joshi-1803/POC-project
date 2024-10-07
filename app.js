@@ -6,14 +6,11 @@ const rankResults = require("./utils/rankResults");
 require("dotenv").config();
 
 const app = express();
-app.use(express.json());
-
-// Use the `.search()` method from each controller as a callback function
+app.use(express.json());// Use the `.search()` method
 app.get("/youtube", youtubeController.search);
 app.get("/articles", articleController.search);
 app.get("/papers", paperController.search);
 
-// Combined search route
 app.get("/search", async (req, res) => {
   const searchTerm = req.query.q;
   try {
@@ -35,7 +32,6 @@ app.get("/search", async (req, res) => {
   }
 });
 
-// Start the server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
