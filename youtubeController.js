@@ -1,6 +1,5 @@
 const axios = require("axios");
 
-// Define the search function to handle YouTube searches
 exports.search = async (req, res) => {
   const searchTerm = req.query.q;
 
@@ -9,7 +8,7 @@ exports.search = async (req, res) => {
   }
 
   try {
-    // Step 1: Fetch YouTube videos based on the search term
+   
     const response = await axios.get(
       "https://www.googleapis.com/youtube/v3/search",
       {
@@ -17,16 +16,12 @@ exports.search = async (req, res) => {
           part: "snippet",
           q: searchTerm,
           type: "video",
-          maxResults: 10, // Limit the number of results to 10
+          maxResults: 10, 
           key: process.env.YOUTUBE_API_KEY,
         },
       }
     );
-
-    // Step 2: Extract video details from the response
     let videos = response.data.items;
-
-    // Step 3: For each video, fetch detailed statistics like views and likes
     let videoDetailsPromises = videos.map((video) => {
       return axios.get("https://www.googleapis.com/youtube/v3/videos", {
         params: {
@@ -37,10 +32,10 @@ exports.search = async (req, res) => {
       });
     });
 
-    // Step 4: Wait for all statistics to be fetched
+    
     let videoDetailsResponses = await Promise.all(videoDetailsPromises);
 
-    // Step 5: Combine the video details with their statistics (views, likes)
+    
     let rankedVideos = videos.map((video, index) => {
       let details = videoDetailsResponses[index].data.items[0].statistics;
       return {
@@ -53,7 +48,7 @@ exports.search = async (req, res) => {
       };
     });
 
-    // Step 6: Sort the videos by views and likes (Optional: Adjust ranking logic)
+    
     rankedVideos.sort((a, b) => {
       // Rank first by views, then by likes
       if (parseInt(b.views) === parseInt(a.views)) {
@@ -62,7 +57,7 @@ exports.search = async (req, res) => {
       return parseInt(b.views) - parseInt(a.views);
     });
 
-    // Step 7: Return the ranked videos as a response
+   
     res.json(rankedVideos);
   } catch (error) {
     console.error("Error fetching YouTube data", error);
